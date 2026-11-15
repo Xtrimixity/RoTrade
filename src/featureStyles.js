@@ -10,9 +10,9 @@ const css = `
 /* item flags: one badge style for value (V), RAP-only (R), rare (star) and projected (P) */
 .rv-flagbox{position:absolute;top:4px;left:4px;z-index:4;display:flex;flex-direction:column;gap:3px;max-width:22px;background:none !important;border:0 !important;padding:0 !important;}
 .rv-flagbox-right{left:auto;right:4px;}
-.rv-flag{width:19px;height:19px;flex:none;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:900 11px/1 Arial,Helvetica,sans-serif;color:#fff;box-shadow:0 0 0 1.5px rgba(255,255,255,.92),0 1px 4px rgba(0,0,0,.5);cursor:pointer;user-select:none;transition:transform .12s ease;}
+.rv-flag{width:19px;height:19px;flex:none;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:900 11px/1 Arial,Helvetica,sans-serif;color:#fff !important;-webkit-text-fill-color:currentColor !important;box-shadow:0 0 0 1.5px rgba(255,255,255,.92),0 1px 4px rgba(0,0,0,.5);cursor:pointer;user-select:none;transition:transform .12s ease;}
 .rv-flag:hover{transform:scale(1.15);}
-.rv-flag-value{background:#E8A500;color:#1d1400;}
+.rv-flag-value{background:#E8A500;color:#1d1400 !important;}
 .rv-flag-rap{background:#2F80ED;}
 .rv-flag-rare{background:#9B51E0;font-size:12px;}
 .rv-flag-projected{background:#EB3B3B;}

@@ -398,7 +398,7 @@ export function calculateTotalsFromExtraData(extraData, valueData, subtractRobux
             }
             totalValue += getValueOrRAP(parseInt(itemId), getItemTypeFromAssetData(asset), valueData);
         });
-        const addedRobux = offer.robux;
+        const addedRobux = Number(offer?.robux) || 0;
         const addedRobuxAfterFee = applyTax(addedRobux);
         totalValue += subtractRobuxFeeFromValue ? addedRobuxAfterFee : addedRobux;
         totals[index] = totalValue;

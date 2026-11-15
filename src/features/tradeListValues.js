@@ -132,6 +132,34 @@ function applySort(rows, scores, mode) {
     rows.filter((row) => !scores.has(row)).forEach((row) => { row.style.order = "9999"; }); //trades RoValk has no data for yet go last
 }
 
+/*
+The background cache (cachingSystem.js) only refreshes once a minute and loads at most 20 trades per run,
+so a trade that just arrived has no data yet. Rows like that are fetched here straight away and kept for this page.
+They are not written to the background cache, so trade notifications still fire as normal.
+*/
+const liveTrades = {};
+const inFlight = new Set();
+async function fetchMissingTrades(ids) {
+    const todo = ids.filter((id) => !inFlight.has(id)).slice(0, 12);
+    if (!todo.length) return false;
+    todo.forEach((id) => inFlight.add(id));
+    let added = false;
+    for (let i = 0; i < todo.length; i += 4) {
+        await Promise.all(todo.slice(i, i + 4).map(async (id) => {
+            try {
+                const response = await fetch(`https://trades.roblox.com/v2/trades/${id}`, { credentials: "include" });
+                if (response.status !== 200) return;
+                const trade = await response.json();
+                trade.tradeType = trade.status === "Open" ? "open" : String(trade.status ?? "").toLowerCase();
+                liveTrades[id] = trade;
+                added = true;
+            } catch { /* try again on the next update */ }
+            finally { inFlight.delete(id); }
+        }));
+    }
+    return added;
+}
+
 let running = false;
 let pending = false;
 async function updateTradeListValues() {
@@ -143,7 +171,9 @@ async function updateTradeListValues() {
     running = true;
     try {
         await utilities.waitForElm(".trade-row");
-        const [tradeListData] = await Promise.all([getTradeListData(), requestRowIds()]);
+        const [cachedData] = await Promise.all([getTradeListData(), requestRowIds()]);
+        const tradeListData = { ...liveTrades, ...cachedData };
+        const missing = [];
         await new Promise((resolve) => setTimeout(resolve, 50)); //let the page script finish tagging rows
         const threshold = await getStoredFilter();
         const sortMode = await getStoredSort();
@@ -152,8 +182,12 @@ async function updateTradeListValues() {
         let hiddenCount = 0;
 
         for (const row of rows) {
-            const tradeData = tradeListData[row.getAttribute("rolimonsTradeId")];
-            if (!tradeData) continue;
+            const rowId = row.getAttribute("rolimonsTradeId");
+            const tradeData = tradeListData[rowId];
+            if (!tradeData) {
+                if (/^\d+$/.test(rowId ?? "")) missing.push(rowId);
+                continue;
+            }
             const totals = utilities.calculateTotalsFromExtraData(tradeData, utilities.getRolimonsData(), false);
             const give = totals[0] ?? 0;
             const receive = totals[1] ?? 0;
@@ -175,7 +209,7 @@ async function updateTradeListValues() {
                 values.title = "Top: what you give. Bottom: what you get (Rolimons value, or RAP when there is none)";
                 box.appendChild(values);
             }
-            const left = expiryOn && (tradeData.tradeType === "inbound" || tradeData.tradeType === "outbound") ? timeLeft(tradeData.expiration) : null;
+            const left = expiryOn && (tradeData.tradeType === "inbound" || tradeData.tradeType === "outbound" || tradeData.tradeType === "open") ? timeLeft(tradeData.expiration) : null;
             if (left) {
                 const chip = el("span", `rv-tl-exp${left.urgent ? " rv-urgent" : ""}`, left.text);
                 chip.title = `Expires ${new Date(tradeData.expiration).toLocaleString()}`;
@@ -196,6 +230,7 @@ async function updateTradeListValues() {
             bar.querySelector(".rv-tl-hidden").textContent = hiddenCount ? `${hiddenCount} hidden` : "";
             applySort(rows, scores, gradesOn ? sortMode : "roblox");
         }
+        if (missing.length && await fetchMissingTrades(missing)) pending = true; //draw the new rows as soon as their data is in
     } finally {
         running = false;
         if (pending) {
