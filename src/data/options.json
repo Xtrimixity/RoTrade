@@ -1,0 +1,321 @@
+[
+    "Look & feel",
+    {
+        "name": "Trade Page Redesign",
+        "label": "Trade page redesign",
+        "desc": "Restyles the Roblox trades page in your theme.",
+        "enabledByDefault": true,
+        "path": "trade-page-redesign",
+        "noInfoLink": true
+    },
+    {
+        "name": "Site-Wide Theme",
+        "label": "Theme the whole site",
+        "desc": "Paints Cherry Blossom / RGB Flow over all of roblox.com.",
+        "enabledByDefault": true,
+        "path": "site-wide-theme",
+        "noInfoLink": true
+    },
+    {
+        "name": "Ambient Particles",
+        "label": "Floating petals",
+        "desc": "Animated petals for themes that have them.",
+        "enabledByDefault": true,
+        "path": "ambient-particles",
+        "noInfoLink": true
+    },
+    "Trade page",
+    {
+        "name": "Trade Win/Loss Stats",
+        "label": "Win/loss badge",
+        "desc": "The round RAP and value badge between the two sides.",
+        "enabledByDefault": true,
+        "path": "trade-win-loss-stats",
+        "noInfoLink": true
+    },
+    {
+        "name": "Trade Breakdown",
+        "label": "Breakdown panel",
+        "desc": "Give vs get table and where the value is.",
+        "enabledByDefault": true,
+        "path": "trade-breakdown",
+        "noInfoLink": true
+    },
+    {
+        "name": "Trade Warnings",
+        "label": "Warnings",
+        "desc": "Projected, rare, low demand and other things to check.",
+        "enabledByDefault": true,
+        "path": "trade-warnings",
+        "noInfoLink": true
+    },
+    {
+        "name": "Market Pulse",
+        "label": "Market data",
+        "desc": "Up/down arrows, best price and RAP after sale for every item.",
+        "enabledByDefault": true,
+        "path": "market-pulse",
+        "noInfoLink": true
+    },
+    {
+        "name": "Even-It-Out Suggestions",
+        "label": "Even-it-out ideas",
+        "desc": "Items that would make an unfair trade fair.",
+        "enabledByDefault": true,
+        "path": "even-it-out-suggestions",
+        "noInfoLink": true
+    },
+    {
+        "name": "Trade Partner Card",
+        "label": "Partner card",
+        "desc": "Who you're trading with: age, value, past trades.",
+        "enabledByDefault": true,
+        "path": "trade-partner-card",
+        "noInfoLink": true
+    },
+    {
+        "name": "Values on Trading Window",
+        "label": "Item values",
+        "desc": "Rolimons value under every item.",
+        "enabledByDefault": true,
+        "path": "values-on-trading-window",
+        "noInfoLink": true
+    },
+    {
+        "name": "Serial Numbers",
+        "label": "Serial numbers",
+        "desc": "Shows each copy's serial, special ones in gold.",
+        "enabledByDefault": true,
+        "path": "serial-numbers",
+        "noInfoLink": true
+    },
+    {
+        "name": "Good Deal Finder",
+        "label": "Good deal finder",
+        "desc": "Marks underrated or rising items in their inventory.",
+        "enabledByDefault": true,
+        "path": "good-deal-finder",
+        "noInfoLink": true
+    },
+    {
+        "name": "Inventory Sort & Filter",
+        "label": "Inventory sort & filter",
+        "desc": "Sort and filter inventories when making a trade.",
+        "enabledByDefault": true,
+        "path": "inventory-sort-&-filter",
+        "noInfoLink": true
+    },
+    {
+        "name": "Copy Trade Summary",
+        "label": "Copy button",
+        "desc": "Copy a text summary of the trade.",
+        "enabledByDefault": true,
+        "path": "copy-trade-summary",
+        "noInfoLink": true
+    },
+    "Trade list",
+    {
+        "name": "Values on Trade Lists",
+        "label": "Values",
+        "desc": "What you give and get on each trade in the list.",
+        "enabledByDefault": true,
+        "path": "values-on-trade-lists",
+        "noInfoLink": true
+    },
+    {
+        "name": "Trade List Grades",
+        "label": "Grades & sorting",
+        "desc": "Win/loss ring per trade, sort best to worst, filter.",
+        "enabledByDefault": true,
+        "path": "trade-list-grades",
+        "noInfoLink": true
+    },
+    {
+        "name": "Trade Expiry Timers",
+        "label": "Expiry timers",
+        "desc": "How long each open trade has left.",
+        "enabledByDefault": true,
+        "path": "trade-expiry-timers",
+        "noInfoLink": true
+    },
+    "Items",
+    {
+        "name": "Item Hover Cards",
+        "label": "Hover cards",
+        "desc": "Hover any limited for value, RAP after sale and trend.",
+        "enabledByDefault": true,
+        "path": "item-hover-cards",
+        "noInfoLink": true
+    },
+    {
+        "name": "Demand Badges",
+        "label": "Demand badges",
+        "desc": "Rolimons demand on item cards.",
+        "enabledByDefault": true,
+        "path": "demand-badges",
+        "noInfoLink": true
+    },
+    {
+        "name": "Wishlist Highlights",
+        "label": "Wishlist stars",
+        "desc": "Gold star on items you've wishlisted.",
+        "enabledByDefault": true,
+        "path": "wishlist-highlights",
+        "noInfoLink": true
+    },
+    {
+        "name": "Flag Valued Items",
+        "label": "Value icon (V)",
+        "desc": "Item has a Rolimons value.",
+        "enabledByDefault": true,
+        "path": "flag-valued-items",
+        "noInfoLink": true
+    },
+    {
+        "name": "Flag RAP-only Items",
+        "label": "RAP icon (R)",
+        "desc": "Item has no value, RAP is used.",
+        "enabledByDefault": true,
+        "path": "flag-rap-only-items",
+        "noInfoLink": true
+    },
+    {
+        "name": "Flag Rare Items",
+        "label": "Rare icon (\u2605)",
+        "desc": "Item is rare.",
+        "enabledByDefault": true,
+        "path": "flag-rare-items",
+        "noInfoLink": true
+    },
+    {
+        "name": "Flag Projected Items",
+        "label": "Projected icon (P)",
+        "desc": "Item's RAP is inflated.",
+        "enabledByDefault": true,
+        "path": "flag-projected-items",
+        "noInfoLink": true
+    },
+    {
+        "name": "Value Tier Borders",
+        "label": "Value tier borders",
+        "desc": "Colored ring by how valuable an item is.",
+        "enabledByDefault": true,
+        "path": "value-tier-borders",
+        "noInfoLink": true
+    },
+    {
+        "name": "Add Item Profile Links",
+        "label": "Rolimons links",
+        "desc": "Quick link to each item's Rolimons page.",
+        "enabledByDefault": true,
+        "path": "add-item-profile-links",
+        "noInfoLink": true
+    },
+    "Profiles & catalog",
+    {
+        "name": "Values on Catalog Pages",
+        "label": "Catalog values",
+        "desc": "Value and RAP on catalog pages.",
+        "enabledByDefault": true,
+        "path": "values-on-catalog-pages",
+        "noInfoLink": true
+    },
+    {
+        "name": "Profile Value Banner",
+        "label": "Profile banner",
+        "desc": "Total value, RAP and top item on profiles.",
+        "enabledByDefault": true,
+        "path": "profile-value-banner",
+        "noInfoLink": true
+    },
+    {
+        "name": "Inventory Summary",
+        "label": "Inventory summary",
+        "desc": "Totals at the top of inventory pages.",
+        "enabledByDefault": true,
+        "path": "inventory-summary",
+        "noInfoLink": true
+    },
+    {
+        "name": "Show User RoliBadges",
+        "label": "RoliBadges",
+        "desc": "Rolimons badges on profiles.",
+        "enabledByDefault": true,
+        "path": "show-user-roli-badges",
+        "noInfoLink": true
+    },
+    {
+        "name": "Add User Profile Links",
+        "label": "Profile links",
+        "desc": "Rolimons link on user profiles.",
+        "enabledByDefault": true,
+        "path": "add-user-profile-links",
+        "noInfoLink": true
+    },
+    {
+        "name": "Add Send Button",
+        "label": "Send trade button",
+        "desc": "A quick Send button on profiles.",
+        "enabledByDefault": false,
+        "path": "add-send-button",
+        "noInfoLink": true
+    },
+    {
+        "name": "Compact Value Numbers",
+        "label": "Short numbers",
+        "desc": "Show 1,250,000 as 1.25M.",
+        "enabledByDefault": false,
+        "path": "compact-value-numbers",
+        "noInfoLink": true
+    },
+    "Tracking",
+    {
+        "name": "Trade History Tracking",
+        "label": "Trade history",
+        "desc": "Saves completed trades for Stats.",
+        "enabledByDefault": true,
+        "path": "trade-history-tracking",
+        "noInfoLink": true
+    },
+    "Notifications",
+    {
+        "name": "Inbound Trade Notifications",
+        "label": "New trades",
+        "desc": "When someone sends you a trade.",
+        "enabledByDefault": false,
+        "path": "inbound-trade-notifications",
+        "noInfoLink": true
+    },
+    {
+        "name": "Completed Trade Notifications",
+        "label": "Accepted trades",
+        "desc": "When a trade you sent is accepted.",
+        "enabledByDefault": false,
+        "path": "completed-trade-notifications",
+        "noInfoLink": true
+    },
+    {
+        "name": "Declined Trade Notifications",
+        "label": "Declined trades",
+        "desc": "When a trade you sent is declined.",
+        "enabledByDefault": false,
+        "path": "declined-trade-notifications",
+        "noInfoLink": true
+    },
+    {
+        "name": "Value Change Notifications",
+        "label": "Value changes",
+        "desc": "When Rolimons changes the value of your items.",
+        "enabledByDefault": false,
+        "path": "value-change-notifications",
+        "noInfoLink": true
+    },
+    {
+        "name": "Trade Ad Posted Notifications",
+        "label": "Trade ad posted",
+        "desc": "Each time your Rolimons ad posts.",
+        "enabledByDefault": false,
+        "path": "trade-ad-posted-notifications",
+        "noInfoLink": true
+    }
+]

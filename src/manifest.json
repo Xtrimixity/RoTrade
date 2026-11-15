@@ -1,0 +1,110 @@
+{
+  "manifest_version": 3,
+  "name": "RoTrade - Roblox Trading Addon",
+  "version": "1.0.0",
+  "description": "Trading tools for Roblox limiteds: live values, market data, trade breakdowns and Rolimons ad posting. Based on RoValk.",
+  "short_name": "RoTrade",
+  "permissions": [
+    "storage",
+    "alarms"
+  ],
+  "optional_permissions": [
+    "notifications"
+  ],
+  "icons": {
+    "16": "assets/icons/logo16.png",
+    "32": "assets/icons/logo32.png",
+    "48": "assets/icons/logo48.png",
+    "128": "assets/icons/logo128.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.roblox.com/*",
+        "https://roblox.com/*"
+      ],
+      "run_at": "document_start",
+      "js": [
+        "csSite.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://*.roblox.com/trades*",
+        "https://*.roblox.com/*/trades*",
+        "https://*.roblox.com/users/*/trade*",
+        "https://*.roblox.com/*/users/*/trade*"
+      ],
+      "run_at": "document_idle",
+      "js": [
+        "csTrade.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://*.roblox.com/catalog/*",
+        "https://*.roblox.com/*/catalog/*",
+        "https://*.roblox.com/catalog*",
+        "https://*.roblox.com/*/catalog*",
+        "https://*.roblox.com/bundles/*",
+        "https://*.roblox.com/*/bundles/*",
+        "https://*.roblox.com/bundles*",
+        "https://*.roblox.com/*/bundles*"
+      ],
+      "run_at": "document_idle",
+      "js": [
+        "csCatalog.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://*.roblox.com/users/*/profile*",
+        "https://*.roblox.com/*/users/*/profile*",
+        "https://*.roblox.com/users/*/inventory*",
+        "https://*.roblox.com/*/users/*/inventory*"
+      ],
+      "run_at": "document_idle",
+      "js": [
+        "csUserProfile.js"
+      ]
+    }
+  ],
+  "options_ui": {
+    "page": "popup.html",
+    "open_in_tab": false
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/*",
+        "assets/icons/*",
+        "assets/roliBadges/*",
+        "elements/*",
+        "scripts/initTooltips.js",
+        "scripts/addTradeIdToRow.js",
+        "scripts/getOpenTradeId.js"
+      ],
+      "matches": [
+        "https://*.roblox.com/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": [
+    "https://*.roblox.com/*",
+    "https://api.rolimons.com/*",
+    "https://*.rbxcdn.com/*"
+  ],
+  "optional_host_permissions": [
+    "https://discord.com/api/webhooks/*",
+    "https://discordapp.com/api/webhooks/*",
+    "https://canary.discord.com/api/webhooks/*",
+    "https://ptb.discord.com/api/webhooks/*"
+  ]
+}

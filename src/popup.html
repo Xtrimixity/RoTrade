@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="popup.css">
+    <script src="popup.js" type="module" defer></script>
+</head>
+
+<body class="rv-app">
+    <header class="rv-top">
+        <div class="rv-brand">
+            <img id="rovalkImage" alt="" />
+            <span class="rv-brand-text">RoTrade<small>based on RoValk</small></span>
+        </div>
+        <button type="button" id="rvHeaderAdsButton" class="rv-top-ads" title="Build and auto-post your Rolimons trade ad"><span class="rv-dot" id="rvHeaderAdsDot"></span>Trade Ad</button>
+    </header>
+
+    <nav class="rv-nav" role="tablist" aria-label="RoTrade sections">
+        <button type="button" role="tab" class="rv-tab" id="tab-1-button" data-page="1">Settings</button>
+        <button type="button" role="tab" class="rv-tab" id="tab-5-button" data-page="5"><span class="rv-dot" id="rvTabAdsDot"></span>Trade Ads</button>
+        <button type="button" role="tab" class="rv-tab" id="tab-6-button" data-page="6">Tools</button>
+        <button type="button" role="tab" class="rv-tab" id="tab-3-button" data-page="3">Stats</button>
+        <button type="button" role="tab" class="rv-tab" id="tab-2-button" data-page="2">Themes</button>
+        <span class="rv-nav-ink" aria-hidden="true"></span>
+    </nav>
+
+    <main class="rv-main">
+        <section class="window" id="window-1" role="tabpanel"></section>
+
+        <section class="window" id="window-2" role="tabpanel" hidden>
+            <h2 class="rv-page-title">Theme</h2>
+            <p class="rv-page-hint">Applies to this popup and everything RoTrade adds to Roblox.</p>
+            <div id="themeGrid" class="theme-grid"></div>
+            <div id="themeEditor" class="theme-editor" hidden></div>
+        </section>
+
+        <section class="window" id="window-3" role="tabpanel" hidden></section>
+        <section class="window" id="window-5" role="tabpanel" hidden></section>
+        <section class="window" id="window-6" role="tabpanel" hidden></section>
+
+        <div id="historyApp" hidden></div>
+    </main>
+</body>
+
+</html>

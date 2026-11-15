@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.tab-active {
+    @apply text-theme !border-theme;
+  }
+.tab{
+    --tab-padding:2.5rem;
+    @apply h-12 hover:bg-slate-100;
+}

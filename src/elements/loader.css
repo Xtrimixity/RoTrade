@@ -1,0 +1,30 @@
+.loader {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    position: relative;
+    box-sizing: border-box;
+    transition: all 0.5s;
+  }
+  .loader.spinning{
+    background: linear-gradient(0deg, rgba(213, 87, 255, 0.2) 33%, #EA580C 100%);
+    animation: rotation 1s linear infinite;
+    width: 156px;
+    height: 156px;
+  }
+  .loader::after {
+    content: '';  
+    box-sizing: border-box;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: #3D4451;
+  }
+  @keyframes rotation {
+    0% { transform: rotate(0deg) }
+    100% { transform: rotate(360deg)}
+  } 
