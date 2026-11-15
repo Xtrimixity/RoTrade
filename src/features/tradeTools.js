@@ -56,10 +56,10 @@ async function updateTradeTools() {
     }
     //Trade details page: right under the receiving offer.
     //Send / counter page: at the bottom of the big inventory column, where there is room for it to be wide.
-    const wideSpot = pageType === "sendOrCounter" ? document.querySelector(".inventory-panel-holder") : null;
-    box.classList.toggle("rv-wide", !!wideSpot);
-    if (wideSpot) {
-        if (box.previousElementSibling !== wideSpot) wideSpot.insertAdjacentElement("afterend", box);
+    const wideColumn = pageType === "sendOrCounter" ? findInventoryColumn(offers[0], box) : null;
+    box.classList.toggle("rv-wide", !!wideColumn);
+    if (wideColumn) {
+        if (box.parentElement !== wideColumn || box !== wideColumn.lastElementChild) wideColumn.appendChild(box);
     } else if (box.previousElementSibling !== offers[1]) offers[1].insertAdjacentElement("afterend", box);
 
     const signature = JSON.stringify([options, isClosedTrade, collapsed, give.items.map((i) => [i.id, i.value]), give.robux, get.items.map((i) => [i.id, i.value]), get.robux]);
@@ -68,6 +68,28 @@ async function updateTradeTools() {
     box.classList.toggle("rv-closed", isClosedTrade);
     box.classList.toggle("rv-collapsed", collapsed);
     box.replaceChildren(...buildPanel(give, get, options, isClosedTrade, box));
+}
+
+/*
+The send / counter page is two columns: inventories on the left (wide) and the offer on the right (narrow).
+Roblox has renamed these containers before, so instead of trusting one class name, walk up from the offer until a
+sibling column shows up that is wider and holds item cards. That sibling is the inventory column.
+*/
+function findInventoryColumn(offerElement, box) {
+    const known = document.querySelector(".inventory-panel-holder")?.parentElement;
+    if (known && !known.contains(offerElement)) return known;
+    let column = offerElement;
+    for (let depth = 0; column?.parentElement && column.parentElement !== document.body && depth < 12; depth++) {
+        const parent = column.parentElement;
+        const width = column.getBoundingClientRect().width;
+        for (const sibling of parent.children) {
+            if (sibling === column || sibling === box) continue;
+            const rect = sibling.getBoundingClientRect();
+            if (rect.width > width * 1.15 && sibling.querySelector(".item-card-container, .item-card, .item-card-thumb-container, [class*='inventory']")) return sibling;
+        }
+        column = parent;
+    }
+    return null;
 }
 
 async function collectOffer(offerElement, pageType) {
