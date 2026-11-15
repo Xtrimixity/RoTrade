@@ -55,11 +55,17 @@ async function updateTradeTools() {
         box.setAttribute("aria-label", "RoTrade trade breakdown");
     }
     //Trade details page: right under the receiving offer.
-    //Send / counter page: at the bottom of the big inventory column, where there is room for it to be wide.
-    const wideColumn = pageType === "sendOrCounter" ? findInventoryColumn(offers[0], box) : null;
-    box.classList.toggle("rv-wide", !!wideColumn);
-    if (wideColumn) {
-        if (box.parentElement !== wideColumn || box !== wideColumn.lastElementChild) wideColumn.appendChild(box);
+    //Send / counter page: underneath the whole trade (inventories and offer), full width.
+    const tradeRow = pageType === "sendOrCounter" ? findTradeRow(offers[0], box) : null;
+    box.classList.toggle("rv-wide", !!tradeRow);
+    if (tradeRow) {
+        //last item inside the two-column row, on its own full-width line, so it lines up exactly with the trade above
+        const rowStyle = getComputedStyle(tradeRow);
+        if (rowStyle.display.includes("flex")) {
+            tradeRow.style.setProperty("flex-wrap", "wrap", "important");
+            tradeRow.style.setProperty("align-content", "flex-start", "important");
+        }
+        if (box.parentElement !== tradeRow || box !== tradeRow.lastElementChild) tradeRow.appendChild(box);
     } else if (box.previousElementSibling !== offers[1]) offers[1].insertAdjacentElement("afterend", box);
 
     const signature = JSON.stringify([options, isClosedTrade, collapsed, give.items.map((i) => [i.id, i.value]), give.robux, get.items.map((i) => [i.id, i.value]), get.robux]);
@@ -75,9 +81,19 @@ The send / counter page is two columns: inventories on the left (wide) and the o
 Roblox has renamed these containers before, so instead of trusting one class name, walk up from the offer until a
 sibling column shows up that is wider and holds item cards. That sibling is the inventory column.
 */
-function findInventoryColumn(offerElement, box) {
-    const known = document.querySelector(".inventory-panel-holder")?.parentElement;
-    if (known && !known.contains(offerElement)) return known;
+/*
+The send / counter page is two columns: inventories on the left and the offer on the right. The breakdown goes
+underneath both of them, full width. Roblox has renamed these containers before, so instead of trusting one class
+name, walk up from the offer until a sibling column shows up that is wider and holds item cards: their shared parent
+is the two-column row.
+*/
+function findTradeRow(offerElement, box) {
+    const known = document.querySelector(".inventory-panel-holder");
+    if (known) {
+        let row = known.parentElement;
+        while (row && !row.contains(offerElement)) row = row.parentElement;
+        if (row && row !== document.body) return row;
+    }
     let column = offerElement;
     for (let depth = 0; column?.parentElement && column.parentElement !== document.body && depth < 12; depth++) {
         const parent = column.parentElement;
@@ -85,7 +101,7 @@ function findInventoryColumn(offerElement, box) {
         for (const sibling of parent.children) {
             if (sibling === column || sibling === box) continue;
             const rect = sibling.getBoundingClientRect();
-            if (rect.width > width * 1.15 && sibling.querySelector(".item-card-container, .item-card, .item-card-thumb-container, [class*='inventory']")) return sibling;
+            if (rect.width > width * 1.15 && sibling.querySelector(".item-card-container, .item-card, .item-card-thumb-container, [class*='inventory']")) return parent;
         }
         column = parent;
     }
