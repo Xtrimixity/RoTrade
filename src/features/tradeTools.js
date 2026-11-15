@@ -54,8 +54,13 @@ async function updateTradeTools() {
         box.id = PANEL_ID;
         box.setAttribute("aria-label", "RoTrade trade breakdown");
     }
-    //the panel sits right under the receiving offer (on the send / counter page that is inside the offers column)
-    if (box.previousElementSibling !== offers[1]) offers[1].insertAdjacentElement("afterend", box);
+    //Trade details page: right under the receiving offer.
+    //Send / counter page: at the bottom of the big inventory column, where there is room for it to be wide.
+    const wideSpot = pageType === "sendOrCounter" ? document.querySelector(".inventory-panel-holder") : null;
+    box.classList.toggle("rv-wide", !!wideSpot);
+    if (wideSpot) {
+        if (box.previousElementSibling !== wideSpot) wideSpot.insertAdjacentElement("afterend", box);
+    } else if (box.previousElementSibling !== offers[1]) offers[1].insertAdjacentElement("afterend", box);
 
     const signature = JSON.stringify([options, isClosedTrade, collapsed, give.items.map((i) => [i.id, i.value]), give.robux, get.items.map((i) => [i.id, i.value]), get.robux]);
     if (box.dataset.sig === signature) return; //same trade, same numbers: leave it alone so nothing flickers

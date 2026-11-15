@@ -40,6 +40,10 @@ const css = `
 
 /* ---------- market table ---------- */
 #rovalkTradeTools .rv-market{container-type:inline-size;}
+#rovalkTradeTools.rv-wide{margin-top:16px;}
+#rovalkTradeTools .rv-even-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 16px;}
+#rovalkTradeTools .rv-even-sub{font-size:12px;font-weight:700;opacity:.8;margin:2px 0 6px;}
+#rovalkTradeTools .rv-even-col{min-width:0;}
 #rovalkTradeTools .rv-market-loading,#rovalkTradeTools .rv-even-body{font-size:13px;opacity:.75;}
 #rovalkTradeTools .rv-market-table{display:grid;grid-template-columns:minmax(110px,1.6fr) minmax(0,1.1fr) minmax(0,1.3fr) minmax(0,.6fr) minmax(0,.6fr) 92px minmax(52px,.7fr);border:1px solid var(--rv-border);border-radius:10px;overflow:hidden;font-size:12px;font-variant-numeric:tabular-nums;}
 #rovalkTradeTools .rv-market-row{display:contents;}

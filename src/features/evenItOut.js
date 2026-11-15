@@ -57,9 +57,68 @@ function bestCombos(pool, give, get, addToGet) {
     }).slice(0, 3);
 }
 
+//Swap ideas: replace one item already in the trade with a different item from the same inventory.
+function bestSwaps(pool, sideItems, give, get, onGet) {
+    const results = [];
+    const seenOut = new Set();
+    for (const out of sideItems) {
+        if (!(out.value > 0) || seenOut.has(out.id)) continue;
+        seenOut.add(out.id);
+        for (const candidate of pool) {
+            if (candidate.id === out.id) continue;
+            const change = candidate.value - out.value;
+            const percent = percentDiff(give + (onGet ? 0 : change), get + (onGet ? change : 0));
+            results.push({ out, items: [candidate], percent });
+        }
+    }
+    results.sort((a, b) => Math.abs(a.percent) - Math.abs(b.percent));
+    const seen = new Set();
+    return results.filter((r) => {
+        const key = r.out.id + ">" + r.items[0].id;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    }).slice(0, 3);
+}
+
+function renderCombos(body, combos, emptyText) {
+    body.replaceChildren();
+    if (!combos.length) {
+        body.textContent = emptyText;
+        return;
+    }
+    combos.forEach((combo) => {
+        const row = el("div", "rv-even-row");
+        const names = el("span", "rv-even-items");
+        if (combo.out) {
+            names.appendChild(el("b", "", combo.out.name));
+            names.appendChild(el("span", "rv-muted", " → "));
+        }
+        combo.items.forEach((item, index) => {
+            if (index) names.appendChild(document.createTextNode(" + "));
+            names.appendChild(el("b", "", item.name));
+            names.appendChild(el("span", "rv-muted", ` (${utilities.commafyFull(item.value)})`));
+        });
+        const result = el("span", `rv-even-result ${Math.abs(combo.percent) <= FAIR_PERCENT ? "rv-pos" : ""}`, `→ ${formatPercent(combo.percent)}`);
+        row.append(names, result);
+        body.appendChild(row);
+    });
+}
+
+function section(title) {
+    const wrap = el("div", "rv-even-col");
+    wrap.appendChild(el("div", "rv-even-sub", title));
+    const body = el("div", "rv-even-body", "Looking through inventory...");
+    wrap.appendChild(body);
+    return [wrap, body];
+}
+
 /*
 give / get: sides from tradeTools.js. Returns an element (filled in when inventories arrive) or null when the trade
 is already fair or this is not the send / counter page.
+Two columns: ideas from your inventory and ideas from theirs.
+  You are winning: you could add items, or they could swap one of their items for a cheaper one
+  You are losing:  they could add items, or you could swap one of your items for a cheaper one
 */
 export function buildEvenSection(give, get) {
     if (utilities.getPageType() !== "sendOrCounter") return null;
@@ -67,35 +126,25 @@ export function buildEvenSection(give, get) {
     if (Math.abs(percent) <= FAIR_PERCENT || give.total + get.total === 0) return null;
     const losing = percent < 0;
     const wrap = el("div", "rv-even");
-    wrap.appendChild(el("div", "rv-section-title", losing ? "Even it out: items you could ask for" : "Even it out: items you could add"));
-    const body = el("div", "rv-even-body", "Looking through inventories...");
-    wrap.appendChild(body);
+    wrap.appendChild(el("div", "rv-section-title", "Even it out"));
+    const grid = el("div", "rv-even-grid");
+    wrap.appendChild(grid);
 
-    const userId = losing ? utilities.getPartnerId() : utilities.getMyUserId();
-    const inTrade = (losing ? get : give).items.map((item) => item.id);
-    candidates(userId, inTrade).then((pool) => {
-        body.replaceChildren();
-        if (!pool.length) {
-            body.textContent = losing ? "Couldn't read their inventory (it may be private)." : "Couldn't read your inventory right now.";
-            return;
-        }
-        const combos = bestCombos(pool, give.total, get.total, losing);
-        if (!combos.length) {
-            body.textContent = "Nothing in that inventory gets close.";
-            return;
-        }
-        combos.forEach((combo) => {
-            const row = el("div", "rv-even-row");
-            const names = el("span", "rv-even-items");
-            combo.items.forEach((item, index) => {
-                if (index) names.appendChild(document.createTextNode(" + "));
-                names.appendChild(el("b", "", item.name));
-                names.appendChild(el("span", "rv-muted", ` (${utilities.commafyFull(item.value)})`));
-            });
-            const result = el("span", `rv-even-result ${Math.abs(combo.percent) <= FAIR_PERCENT ? "rv-pos" : ""}`, `→ ${formatPercent(combo.percent)}`);
-            row.append(names, result);
-            body.appendChild(row);
-        });
+    const [mineCol, mineBody] = section(losing ? "You could swap" : "You could add");
+    const [theirCol, theirBody] = section(losing ? "They could add" : "They could swap");
+    grid.append(mineCol, theirCol);
+
+    const myId = utilities.getMyUserId();
+    const theirId = utilities.getPartnerId();
+    candidates(myId, give.items.map((item) => item.id)).then((pool) => {
+        if (!pool.length) return renderCombos(mineBody, [], "Couldn't read your inventory right now.");
+        const combos = losing ? bestSwaps(pool, give.items, give.total, get.total, false) : bestCombos(pool, give.total, get.total, false);
+        renderCombos(mineBody, combos, "Nothing in your inventory gets close.");
+    });
+    candidates(theirId, get.items.map((item) => item.id)).then((pool) => {
+        if (!pool.length) return renderCombos(theirBody, [], "Couldn't read their inventory (it may be private).");
+        const combos = losing ? bestCombos(pool, give.total, get.total, true) : bestSwaps(pool, get.items, give.total, get.total, true);
+        renderCombos(theirBody, combos, "Nothing in their inventory gets close.");
     });
     return wrap;
 }
