@@ -71,6 +71,12 @@ a { color: inherit; }
 .rv-webhook-url { margin-bottom: 0; padding-left: 12px; background-image: none; font-size: 12px; font-family: ui-monospace, Consolas, monospace; }
 .rv-webhook-events { display: flex; flex-wrap: wrap; gap: 6px; }
 .rv-webhook-body .rv-btn { justify-self: start; }
+.rv-webhook-ping { display: flex; gap: 6px; }
+.rv-webhook-ping .rv-set-search { margin-bottom: 0; padding-left: 12px; background-image: none; font-size: 12px; }
+.rv-webhook-select { flex: 0 0 auto; width: auto; min-width: 130px; cursor: pointer; }
+.rv-webhook-id { flex: 1; min-width: 0; font-family: ui-monospace, Consolas, monospace; }
+.rv-webhook-id[hidden], .rv-webhook-events[hidden], .rv-webhook-body .rv-set-name[hidden] { display: none; }
+.rv-webhook-pinghint { margin: -4px 0 0; }
 .rv-webhook-status { font-size: 12px; opacity: 0.75; min-height: 1em; }
 
 /* the one switch style used everywhere in the popup */

@@ -11,7 +11,7 @@ import { mountAds } from "./adsTab";
 import { mountTools } from "./toolsTab";
 import { makeSwitch } from "./popupKit";
 import optionsJSON from "./data/options.json";
-import { WEBHOOK_KEY, WEBHOOK_EVENTS, isWebhookUrl } from "./webhook";
+import { WEBHOOK_KEY, WEBHOOK_EVENTS, PING_MODES, isWebhookUrl, isDiscordId } from "./webhook";
 
 initTheme();
 initPageEffects();
@@ -200,6 +200,7 @@ const DISCORD_ORIGINS = ["https://discord.com/api/webhooks/*", "https://discorda
 async function buildWebhookCard() {
     const saved = await new Promise((resolve) => chrome.storage.local.get([WEBHOOK_KEY], (r) => resolve(r?.[WEBHOOK_KEY] ?? {})));
     let config = { url: "", enabled: false, events: { inbound: true, completed: true, declined: false, ad: true, value: true }, ...saved };
+    config.ping = { mode: "off", id: "", events: { inbound: true, completed: true, declined: false, ad: false, value: false }, ...(saved.ping ?? {}) };
     const store = () => chrome.storage.local.set({ [WEBHOOK_KEY]: config });
 
     const box = el("div", "rv-set-group rv-open rv-webhook");
@@ -256,6 +257,54 @@ async function buildWebhookCard() {
         events.appendChild(chip);
     });
 
+    //Pings: who gets pinged and on which events
+    const pingTitle = el("span", "rv-set-name", "Ping");
+    const pingRow = el("div", "rv-webhook-ping");
+    const pingMode = el("select", "rv-set-search rv-webhook-select");
+    pingMode.setAttribute("aria-label", "Who to ping");
+    PING_MODES.forEach(([key, label]) => {
+        const option = el("option", "", label);
+        option.value = key;
+        pingMode.appendChild(option);
+    });
+    pingMode.value = config.ping.mode;
+    const pingId = el("input", "rv-set-search rv-webhook-id");
+    pingId.inputMode = "numeric";
+    pingId.spellcheck = false;
+    pingId.value = config.ping.id ?? "";
+    const pingHint = el("p", "rv-set-desc rv-webhook-pinghint");
+    const pingOnTitle = el("span", "rv-set-name", "Ping me on (the rest still send, just silently)");
+    const pingEvents = el("div", "rv-webhook-events");
+    WEBHOOK_EVENTS.forEach(([key, label]) => {
+        const chip = el("button", "rv-chip", label);
+        chip.type = "button";
+        chip.setAttribute("aria-pressed", String(!!config.ping.events?.[key]));
+        chip.addEventListener("click", () => {
+            config.ping.events = { ...config.ping.events, [key]: !config.ping.events?.[key] };
+            chip.setAttribute("aria-pressed", String(!!config.ping.events[key]));
+            store();
+        });
+        pingEvents.appendChild(chip);
+    });
+    const refreshPing = () => {
+        const mode = pingMode.value;
+        const needsId = mode === "user" || mode === "role";
+        pingId.hidden = !needsId;
+        pingEvents.hidden = mode === "off";
+        pingOnTitle.hidden = mode === "off";
+        pingId.placeholder = mode === "role" ? "Role ID, e.g. 112233445566778899" : "Your Discord user ID, e.g. 112233445566778899";
+        pingHint.textContent = mode === "off" ? "Messages are sent without pinging anyone."
+            : needsId ? (mode === "role"
+                ? "Server settings → Roles → right-click the role → Copy Role ID. (Turn on Developer Mode in Discord's Advanced settings first.)"
+                : "In Discord: Settings → Advanced → turn on Developer Mode, then right-click your name → Copy User ID.")
+            : `Pings ${mode === "here" ? "everyone online in the channel" : "everyone in the channel"}.`;
+        if (needsId && pingId.value && !isDiscordId(pingId.value)) pingHint.textContent = "That ID should be a long number (15 to 21 digits).";
+    };
+    pingMode.addEventListener("change", () => { config.ping.mode = pingMode.value; store(); refreshPing(); });
+    pingId.addEventListener("input", () => { config.ping.id = pingId.value.trim(); store(); refreshPing(); });
+    refreshPing();
+    pingRow.append(pingMode, pingId);
+
     const test = el("button", "rv-btn", "Send test");
     test.type = "button";
     test.addEventListener("click", () => {
@@ -276,7 +325,7 @@ async function buildWebhookCard() {
         });
     });
     const eventsTitle = el("span", "rv-set-name", "What to send");
-    body.append(hint, input, onRow, eventsTitle, events, test, status);
+    body.append(hint, input, onRow, eventsTitle, events, pingTitle, pingRow, pingHint, pingOnTitle, pingEvents, test, status);
     box.append(head, body);
     return box;
 }

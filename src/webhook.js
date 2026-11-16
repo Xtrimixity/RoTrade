@@ -7,7 +7,27 @@ Discord access is an optional permission, asked for when the webhook is switched
 import * as utilities from "./utilities.js";
 import { renderTradeImage } from "./tradeImage.js";
 
-export const WEBHOOK_KEY = "rotradeWebhook"; // { url, enabled, events: { inbound, completed, declined, ad, value } }
+export const WEBHOOK_KEY = "rotradeWebhook"; // { url, enabled, events: { inbound, completed, declined, ad, value }, ping: { mode, id, events } }
+//Who to ping: off, a Discord user, a role, @here or @everyone. Pings only happen on the events ticked under ping.events.
+export const PING_MODES = [["off", "No ping"], ["user", "Me (user ID)"], ["role", "A role (role ID)"], ["here", "@here"], ["everyone", "@everyone"]];
+export function isDiscordId(id) {
+    return /^\d{15,21}$/.test(String(id ?? "").trim());
+}
+
+//Message text plus allowed_mentions so Discord only pings exactly who was picked.
+function mentionFor(config, event) {
+    const ping = config?.ping;
+    if (!ping || ping.mode === "off" || !ping.mode) return null;
+    if (event !== "test" && !ping.events?.[event]) return null;
+    const id = String(ping.id ?? "").trim();
+    switch (ping.mode) {
+        case "user": return isDiscordId(id) ? { content: `<@${id}>`, allowed_mentions: { parse: [], users: [id] } } : null;
+        case "role": return isDiscordId(id) ? { content: `<@&${id}>`, allowed_mentions: { parse: [], roles: [id] } } : null;
+        case "here": return { content: "@here", allowed_mentions: { parse: ["everyone"] } };
+        case "everyone": return { content: "@everyone", allowed_mentions: { parse: ["everyone"] } };
+        default: return null;
+    }
+}
 export const WEBHOOK_EVENTS = [
     ["inbound", "New trades"], ["completed", "Accepted trades"], ["declined", "Declined trades"],
     ["ad", "Trade ad posted / failed"], ["value", "Value changes on your items"]
@@ -35,6 +55,8 @@ export async function sendWebhook(event, embed, image) {
     try {
         const payload = {
             username: "RoTrade",
+            allowed_mentions: { parse: [] },
+            ...(mentionFor(config, event) ?? {}),
             embeds: [{ color: COLORS[event] ?? COLORS.test, timestamp: new Date().toISOString(), footer: { text: "RoTrade" }, ...embed, ...(image ? { image: { url: "attachment://trade.png" } } : {}) }]
         };
         let response;
