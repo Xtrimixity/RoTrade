@@ -40,6 +40,7 @@ const css = `
 
 /* ---------- market table ---------- */
 #rovalkTradeTools .rv-market{container-type:inline-size;}
+.rv-card-rap{font-size:12px;line-height:16px;opacity:.7;font-weight:500;padding-left:25px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #rovalkTradeTools.rv-wide{margin:16px 0 0 !important;width:100% !important;max-width:none !important;flex:0 0 100% !important;grid-column:1 / -1 !important;clear:both;float:none !important;box-sizing:border-box;order:9999;}
 #rovalkTradeTools .rv-even-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 16px;}
 #rovalkTradeTools .rv-even-sub{font-size:12px;font-weight:700;opacity:.8;margin:2px 0 6px;}

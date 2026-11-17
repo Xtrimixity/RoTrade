@@ -10,6 +10,7 @@ console.info(`%c${utilities.getExtensionTitle()} v${chrome.runtime.getManifest()
 import updateUserProfileLinks from "./features/userProfileLinks";
 import updateCatalogValues from "./features/catalogValues";
 import updateAssetsLinks from "./features/assetLinks";
+import updateCurrentPrices from "./features/currentPrice";
 import updateUserProfileRoliBadges from "./features/userProfileRoliBadges";
 import { updateProfileBanner, updateInventorySummary } from "./features/inventorySummary";
 initTheme();
@@ -27,6 +28,7 @@ async function update() {
     if (utilities.getPageType() === "userInventory") {
         updateCatalogValues();
         updateAssetsLinks();
+        updateCurrentPrices();
         const inventoryUserId = parseInt(window.location.pathname.match(/\/users\/(\d+)\/inventory/)?.[1]);
         if (!isNaN(inventoryUserId)) updateInventorySummary(inventoryUserId);
     }

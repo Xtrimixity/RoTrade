@@ -27,7 +27,7 @@ async function updateCatalogValues() {
     }
 
     if (utilities.getPageType() === "userInventory") {
-        if (!(await utilities.getOption("Values on User Pages"))) {
+        if (!(await utilities.getOption("Values on Catalog Pages"))) { //"Values on User Pages" was merged into this option
             return stripCatalogValues();
         }
 
@@ -40,6 +40,7 @@ function stripCatalogValues() {
     document.querySelector(".value-price-info")?.remove();
     document.querySelector(".value-price-label")?.remove();
 
+    document.querySelectorAll(".rv-card-rap").forEach((line) => line.remove());
     for (element of document.querySelectorAll(".valueSpan")) {
         element.parentElement.getElementsByTagName("br")[0]?.remove();
         element.parentElement.getElementsByClassName("icon-rolimons")[0]?.remove();
@@ -77,6 +78,27 @@ async function updateItemProfilePageValues() {
     }
 }
 
+//Small "RAP 288,817" line under the value, only for items that have a Rolimons value (otherwise the blue line already is the RAP).
+function setRapLine(textDiv, itemId, itemType) {
+    const data = utilities.getItemData(itemId, itemType);
+    const hasValue = data && Number(data[3]) > 0;
+    const rap = Number(data?.[2]);
+    let line = textDiv.querySelector(".rv-card-rap");
+    if (!hasValue || !(rap > 0)) {
+        line?.remove();
+        textDiv.style.height = "44px";
+        return;
+    }
+    if (!line) {
+        line = document.createElement("div");
+        line.className = "rv-card-rap";
+        textDiv.appendChild(line);
+    }
+    line.textContent = `RAP ${utilities.commafy(rap)}`;
+    line.title = `Recent average price: ${utilities.commafyFull(rap)}`;
+    textDiv.style.height = "60px";
+}
+
 async function updateCatalogPageValues() {
     function setTextDivValue(textDiv, value) {
         const valueSpan = textDiv.getElementsByClassName("valueSpan")[0];
@@ -95,13 +117,15 @@ async function updateCatalogPageValues() {
                 utilities.createValuesSpans(textDiv);
             }
 
-            //item values
+            //item values: value (or RAP when there is no value) on the blue line,
+            //and when there is a value, its RAP on a small line underneath so both are visible
             let value = utilities.getValueOrRAP(itemId, itemType);
             setTextDivValue(textDiv, value);
+            setRapLine(textDiv, itemId, itemType);
         }
     }
     for (element of document.getElementsByClassName("list-item")) {
-        element.style.marginBottom = "35px";
+        element.style.marginBottom = "50px"; //room for the value, RAP and price lines
     }
 }
 

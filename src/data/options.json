@@ -221,6 +221,14 @@
         "noInfoLink": true
     },
     {
+        "name": "Current Price on Items",
+        "label": "Current selling price",
+        "desc": "Shows the cheapest price an item is for sale at right now, instead of Roblox repeating the RAP.",
+        "enabledByDefault": true,
+        "path": "current-price-on-items",
+        "noInfoLink": true
+    },
+    {
         "name": "Profile Value Banner",
         "label": "Profile banner",
         "desc": "Total value, RAP and top item on profiles.",

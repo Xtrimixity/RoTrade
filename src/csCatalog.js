@@ -11,6 +11,7 @@ console.info(`%c${utilities.getExtensionTitle()} v${chrome.runtime.getManifest()
 import updateCatalogValues from "./features/catalogValues";
 import updateFlags from "./features/flags.js"
 import updateAssetsLinks from "./features/assetLinks";
+import updateCurrentPrices from "./features/currentPrice";
 initTheme();
 initPageEffects();
 utilities.refreshData(update); //starts the refresh data cycle in utilities which allows utilities.getRolimonsData to be accessed.
@@ -23,6 +24,7 @@ async function update() {
     updateAssetsLinks();
     updateCatalogValues();
     updateFlags();
+    updateCurrentPrices();
 }
 
 (async () => {
@@ -52,7 +54,7 @@ async function update() {
 })();
 
 
-const updateListenerCategories = ["Values", "Item Flags", "Links"];
+const updateListenerCategories = ["Values", "Item Flags", "Links", "Current Price on Items"];
 chrome.runtime.onMessage.addListener(function (request, sender) {
     if (updateListenerCategories.indexOf(request) !== -1) {
         update();

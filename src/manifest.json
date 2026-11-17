@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "RoTrade - Roblox Trading Addon",
-  "version": "1.0.2.4",
+  "version": "1.0.2.6",
   "description": "Trading tools for Roblox limiteds: live values, market data, trade breakdowns and Rolimons ad posting. Based on RoValk.",
   "short_name": "RoTrade",
   "permissions": [

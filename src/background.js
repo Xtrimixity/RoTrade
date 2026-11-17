@@ -4,6 +4,8 @@ import "./tradeHistory.js"; //start trade history tracking
 import "./tradeAds.js"; //Rolimons trade ad auto-poster
 import "./webhook.js"; //Discord webhook notifications
 import "./watchers.js"; //value changes, inventory snapshots, market data for the pages
+import { listenForBestPriceRequests } from "./bestPrice.js";
+listenForBestPriceRequests(); //current selling prices for item cards
 
 //No pages are opened on install or update; RoTrade just starts working.
 chrome.runtime.onInstalled.addListener((details) => {
