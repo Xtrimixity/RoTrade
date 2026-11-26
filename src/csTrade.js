@@ -17,7 +17,7 @@ import { updateMarketBadges } from "./features/marketPulse";
 import updatePartnerCard from "./features/partnerCard";
 import updateSerials from "./features/serials";
 import updateGoodDeals from "./features/goodDeals";
-import updateQueueFill from "./features/queueFill";
+import updateQueueFill, { startQueueWatch } from "./features/queueFill";
 import { initTheme } from "./themes";
 import { initPageEffects } from "./pageEffects";
 import { initTradeRedesign } from "./tradeRedesign";
@@ -28,7 +28,9 @@ initTheme();
 initPageEffects();
 initTradeRedesign();
 injectFeatureStyles();
-utilities.refreshData(update); //starts the refresh data cycle in utilities which allows utilities.getRolimonsData to be accessed.
+utilities.refreshData(update);
+//starts the refresh data cycle in utilities which allows utilities.getRolimonsData to be accessed.
+startQueueWatch(); //trade queue: keeps checking until the send page is ready to fill in
 
 //The parts of the page that change when items or Robux in the open trade change.
 function updateTradeSummary() {

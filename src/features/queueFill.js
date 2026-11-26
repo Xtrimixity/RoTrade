@@ -180,10 +180,34 @@ async function goNext(queue) {
     }, 1000);
 }
 
+/*
+Roblox's send page loads in stages, and moving between the trades list and a send page doesn't reload the page,
+so RoTrade's normal update can run before there's anything to fill. Keep checking every second for a while after
+the page (or its address) changes, until the trade is filled in.
+*/
+let watchStarted = false;
+export function startQueueWatch() {
+    if (watchStarted) return;
+    watchStarted = true;
+    let lastUrl = location.href;
+    let triesLeft = 45;
+    setInterval(() => {
+        if (location.href !== lastUrl) {
+            lastUrl = location.href;
+            filledFor = null;
+            triesLeft = 45;
+        }
+        if (triesLeft <= 0) return;
+        triesLeft--;
+        updateQueueFill().then((done) => { if (done) triesLeft = 0; }).catch(() => {});
+    }, 1000);
+}
+
 export default async function updateQueueFill() {
     const queue = await loadQueue();
-    if (!queue.active) return removeBar();
-    const pageType = utilities.getPageType();
+    if (!queue.active) { removeBar(); return true; }
+    const onSendPage = /\/users\/\d+\/trade/i.test(location.pathname);
+    const pageType = onSendPage ? "sendOrCounter" : utilities.getPageType();
 
     //back on the trades page right after pressing Make Offer: the trade went through
     if (pageType === "details") {
@@ -197,25 +221,33 @@ export default async function updateQueueFill() {
             await saveQueue(queue);
             goNext(queue);
         }
-        return;
+        return true;
     }
-    if (pageType !== "sendOrCounter") return;
+    if (pageType !== "sendOrCounter") return false;
 
     const partnerId = utilities.getPartnerId();
     const recipient = queue.recipients.find((r) => r.id === partnerId);
-    if (!recipient) return removeBar();
+    if (!recipient) { removeBar(); return true; }
     if (recipient.status !== "pending") {
-        return setBar(`${recipient.name} is already marked ${recipient.status}.`, [["Next person", () => goNext(queue), true], ["Close", removeBar]]);
+        setBar(`${recipient.name} is already marked ${recipient.status}.`, [["Next person", () => goNext(queue), true], ["Close", removeBar]]);
+        return true;
     }
-    if (limitReached(queue)) return setBar("You've reached today's limit, so RoTrade won't fill this one in.", [["Close", removeBar]], "done");
-    if (filledFor === partnerId) return;
+    if (limitReached(queue)) {
+        setBar("You've reached today's limit, so RoTrade won't fill this one in.", [["Close", removeBar]], "done");
+        return true;
+    }
+    if (filledFor === partnerId) return true;
+    //wait until Roblox has drawn both inventories before filling anything in
+    if (!document.querySelector(".inventory-panel-holder .item-card-container, .trade-inventory-panel .item-card-container")) {
+        setBar(`Waiting for Roblox to load the trade for ${recipient.name}...`, [["Skip", () => finish("skipped")]], "busy");
+        return false;
+    }
     filledFor = partnerId;
 
     const counter = `${queue.sentToday.count}${queue.limit > 0 ? `/${queue.limit}` : ""} sent today`;
     setBar(`Filling in the trade for ${recipient.name}...`, [], "busy");
-    const ready = await utilities.waitForElm(".inventory-panel-holder .item-card-container, .trade-inventory-panel .item-card-container");
     await sleep(600);
-    const sides = ready && panels();
+    const sides = panels();
     if (!sides) {
         return setBar(`Couldn't find the inventories on this page. Add the items yourself, then press Make Offer. (${counter})`, [["Skip", () => finish("skipped")]], "warn");
     }

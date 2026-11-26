@@ -4,7 +4,7 @@ Start opens the first person's send page; RoTrade fills it in there and you pres
 */
 import * as utilities from "./utilities";
 import { el, button, myInventory, itemSearch, info, section, thumbnails, thumb } from "./popupKit";
-import { loadQueue, saveQueue, updateQueue, nextRecipient, limitReached, tradeUrl, findTraders, resolveUsers, claimNext, maxTabs, openTradeTabs, QUEUE_LIMITS, QUEUE_KEY } from "./tradeQueue";
+import { loadQueue, saveQueue, updateQueue, nextRecipient, limitReached, tradeUrl, findTraders, findOwners, resolveUsers, claimNext, maxTabs, openTradeTabs, QUEUE_LIMITS, QUEUE_KEY } from "./tradeQueue";
 
 //Open trade tabs up to the "max tabs at once" limit. Returns how many were opened.
 async function openUpToLimit() {
@@ -170,25 +170,53 @@ export async function queueView(data, rerender) {
     out.push(trade);
 
     //---- people ----
-    const people = section("Who to send it to", "Find people who are trading the item you want on Rolimons right now, or add usernames yourself.");
-    const peopleStatus = el("p", "rv-calc-hint", "");
+    const people = section("Who to send it to", "Find owners lists everyone who owns the item you want (from Rolimons), most recently online first. Recent trade ads only has people who posted an ad in the last few minutes.");
+    const peopleStatus = el("p", "rv-calc-hint rv-q-found", "");
     const findRow = el("div", "rv-q-row");
-    const find = button("Find traders offering it", "rv-chip", async () => {
+    const addFound = async (found, label) => {
+        const known = new Set(queue.recipients.map((r) => r.id));
+        const fresh = found.filter((r) => !known.has(r.id));
+        const added = fresh.slice(0, Math.max(0, QUEUE_LIMITS.recipients - queue.recipients.length));
+        await save({ recipients: [...queue.recipients, ...added] });
+        setTimeout(() => { const note = document.querySelector(".rv-q-found"); if (note) note.textContent = `${label}: found ${found.length}, added ${added.length} new${fresh.length > added.length ? ` (list is full at ${QUEUE_LIMITS.recipients})` : ""}.`; }, 30);
+    };
+    const filters = el("div", "rv-q-row");
+    const days = el("input", "rv-set-search rv-q-days");
+    days.type = "number";
+    days.min = "0";
+    days.value = String(queue.ownerDays ?? 7);
+    days.addEventListener("change", () => { queue.ownerDays = Math.max(0, Math.floor(Number(days.value) || 0)); saveQueue(queue); });
+    const premiumRow = el("label", "rv-q-check rv-q-muted");
+    const premium = el("input");
+    premium.type = "checkbox";
+    premium.checked = !!queue.ownerPremiumOnly;
+    premium.addEventListener("change", () => { queue.ownerPremiumOnly = premium.checked; saveQueue(queue); });
+    premiumRow.append(premium, el("span", "", "Premium / Plus only"));
+    filters.append(el("span", "rv-q-sub", "Online in the last"), days, el("span", "rv-q-sub", "days (0 = anyone)"), premiumRow);
+    const owners = button("Find owners", "rv-btn", async () => {
+        if (!queue.template.want.length) { peopleStatus.textContent = "Pick the item you want first."; return; }
+        owners.disabled = true;
+        peopleStatus.textContent = "Reading the owner list on Rolimons...";
+        try {
+            return await addFound(await findOwners(queue.template.want, myUserId, { activeDays: queue.ownerDays ?? 7, premiumOnly: !!queue.ownerPremiumOnly }), "Owners");
+        } catch (error) {
+            peopleStatus.textContent = String(error?.message ?? error);
+        }
+        owners.disabled = false;
+    });
+    const find = button("From recent trade ads", "rv-chip", async () => {
         if (!queue.template.want.length) { peopleStatus.textContent = "Pick the item you want first."; return; }
         find.disabled = true;
         peopleStatus.textContent = "Looking through recent Rolimons trade ads...";
         try {
-            const found = await findTraders(queue.template.want, myUserId);
-            const known = new Set(queue.recipients.map((r) => r.id));
-            const added = found.filter((r) => !known.has(r.id)).slice(0, QUEUE_LIMITS.recipients - queue.recipients.length);
-            await save({ recipients: [...queue.recipients, ...added] });
-            return;
+            return await addFound(await findTraders(queue.template.want, myUserId), "Recent trade ads");
         } catch (error) {
             peopleStatus.textContent = String(error?.message ?? error);
         }
         find.disabled = false;
     });
-    findRow.append(find);
+    people.append(filters);
+    findRow.append(owners, find);
     if (queue.recipients.length) findRow.append(button("Clear list", "rv-chip", () => save({ recipients: [], active: false })));
     people.append(findRow);
 
@@ -213,7 +241,9 @@ export async function queueView(data, rerender) {
     const list = el("div", "rv-q-people");
     queue.recipients.slice(0, 60).forEach((recipient, index) => {
         const row = el("div", `rv-tool-row rv-q-person rv-q-${recipient.status}`);
-        row.append(el("span", "rv-side-name", recipient.name), el("span", "rv-q-state", { pending: "waiting", sent: "sent", skipped: "skipped", failed: "failed" }[recipient.status] ?? recipient.status));
+        const who = el("span", "rv-side-name", recipient.name);
+        if (recipient.note) who.title = recipient.note;
+        row.append(who, el("span", "rv-q-state", { pending: "waiting", sent: "sent", skipped: "skipped", failed: "failed" }[recipient.status] ?? recipient.status));
         row.append(button("×", "rv-ad-x", () => save({ recipients: queue.recipients.filter((_, i) => i !== index) })));
         list.appendChild(row);
     });

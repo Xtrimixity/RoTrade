@@ -26,7 +26,7 @@ export const DEFAULT_QUEUE = {
     hideWarning: false,
     maxTabs: 1
 };
-export const QUEUE_LIMITS = { offer: 4, want: 4, recipients: 200, maxTabs: 10 };
+export const QUEUE_LIMITS = { offer: 4, want: 4, recipients: 1000, maxTabs: 10 };
 const CLAIM_MS = 10 * 60 * 1000; //a tab that took someone and then went quiet for 10 minutes gives them back
 
 export function today() {
@@ -117,6 +117,49 @@ export async function findTraders(wantIds, myUserId) {
         out.push({ id: userId, name: String(ad[3] ?? userId), status: "pending", note: "From a Rolimons trade ad" });
     }
     return out;
+}
+
+/*
+Everyone who owns the wanted items, from the owner list on Rolimons' item page (www.rolimons.com/item/{id} has
+"var all_copies_data = {...}" with owner_ids, owner_names, owner_bc_levels (0 = no Premium/Plus) and last_online,
+a unix time). One entry per person, most recently online first.
+options: activeDays (only people online in the last N days, 0 = anyone), premiumOnly
+*/
+export async function findOwners(wantIds, myUserId, options = {}) {
+    const activeDays = Number(options.activeDays) || 0;
+    const since = activeDays > 0 ? Date.now() / 1000 - activeDays * 86400 : 0;
+    const people = new Map();
+    for (const itemId of wantIds) {
+        const response = await fetch(`https://www.rolimons.com/item/${Number(itemId)}`);
+        if (!response.ok) throw new Error(response.status === 429 ? "Rolimons is busy, try again in a minute." : `Rolimons answered ${response.status}.`);
+        const html = await response.text();
+        const start = html.indexOf("var all_copies_data = ");
+        if (start < 0) throw new Error("Rolimons' item page has changed, so RoTrade can't read the owner list.");
+        const from = start + "var all_copies_data = ".length;
+        const end = html.indexOf("};", from);
+        const copies = JSON.parse(html.slice(from, end + 1));
+        (copies.owner_ids ?? []).forEach((id, index) => {
+            const userId = Number(id);
+            if (!userId || userId === 1 || userId === Number(myUserId)) return;
+            const lastOnline = Number(copies.last_online?.[index]) || 0;
+            const premium = Number(copies.owner_bc_levels?.[index]) > 0;
+            if (since && lastOnline < since) return;
+            if (options.premiumOnly && !premium) return;
+            const known = people.get(userId);
+            if (known) { known.copies++; return; }
+            people.set(userId, { id: userId, name: String(copies.owner_names?.[index] ?? userId), status: "pending", lastOnline, copies: 1 });
+        });
+    }
+    return [...people.values()]
+        .sort((a, b) => b.lastOnline - a.lastOnline)
+        .map((person) => ({ ...person, note: `Owns ${person.copies > 1 ? `${person.copies} copies` : "it"}${person.lastOnline ? `, online ${ago(person.lastOnline)}` : ""}` }));
+}
+
+function ago(unixSeconds) {
+    const minutes = Math.max(0, Math.round((Date.now() / 1000 - unixSeconds) / 60));
+    if (minutes < 60) return `${minutes} min ago`;
+    if (minutes < 1440) return `${Math.round(minutes / 60)} h ago`;
+    return `${Math.round(minutes / 1440)} d ago`;
 }
 
 //Usernames or user IDs typed by the user -> recipients.

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "RoTrade - Roblox Trading Addon",
-  "version": "1.0.4.2",
+  "version": "1.0.4.3",
   "description": "Trading tools for Roblox limiteds: live values, market data, trade breakdowns and Rolimons ad posting. Based on RoValk.",
   "short_name": "RoTrade",
   "permissions": [
@@ -99,7 +99,8 @@
   "host_permissions": [
     "https://*.roblox.com/*",
     "https://api.rolimons.com/*",
-    "https://*.rbxcdn.com/*"
+    "https://*.rbxcdn.com/*",
+    "https://www.rolimons.com/*"
   ],
   "optional_host_permissions": [
     "https://discord.com/api/webhooks/*",

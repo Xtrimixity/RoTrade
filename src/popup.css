@@ -328,3 +328,5 @@ body.rv-full .rv-summary { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .rv-q-check { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin: 6px 0; cursor: pointer; }
 .rv-q-muted { font-weight: 500; opacity: 0.8; }
 .rv-q-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.rv-q-days { width: 64px !important; padding-left: 10px !important; background-image: none !important; margin: 0 !important; }
+.rv-q-row .rv-q-sub { margin: 0; }
