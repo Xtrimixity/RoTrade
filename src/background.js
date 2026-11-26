@@ -19,6 +19,11 @@ chrome.runtime.onInstalled.addListener((details) => {
     chrome.storage.local.remove(["RoValk Calculator Preset", "RoValk Trade Style", "RoValk Custom Accent", "Theme Animations", "Compact Trade Layout", "Mobile Trade Items Button", "Trade Fairness Meter", "Overpay Helper", "Shortcut Keys"]);
     //removed in 3.15.0: price alerts and wishlist trade notifications
     chrome.storage.local.remove(["rovalkPriceAlerts", "Price Alert Notifications", "Wishlist Trade Notifications"]);
+    //removed in 1.0.3: the RGB Flow theme and RGB glow. Anyone on RGB Flow goes back to RoTrade Orange.
+    chrome.storage.local.get(["RoValk Theme"], (result) => {
+        if (result?.["RoValk Theme"] === "rgb-flow") chrome.storage.local.remove(["RoValk Theme"]); //back to the default (Roblox Default)
+    });
+    chrome.storage.local.remove(["RoValk Theme Effects"]);
 
 
 });

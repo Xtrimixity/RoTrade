@@ -11,6 +11,7 @@ import { mountAds } from "./adsTab";
 import { mountTools } from "./toolsTab";
 import { makeSwitch } from "./popupKit";
 import optionsJSON from "./data/options.json";
+import { mountSupport } from "./supportTab";
 import { WEBHOOK_KEY, WEBHOOK_EVENTS, PING_MODES, isWebhookUrl, isDiscordId } from "./webhook";
 
 initTheme();
@@ -24,7 +25,8 @@ const mounted = {};
 const mounters = {
     3: () => mountStats(document.getElementById("window-3"), { full: false }),
     5: () => mountAds(document.getElementById("window-5")),
-    6: () => mountTools(document.getElementById("window-6"))
+    6: () => mountTools(document.getElementById("window-6")),
+    7: () => mountSupport(document.getElementById("window-7"))
 };
 const tabs = [...document.querySelectorAll(".rv-tab")];
 const ink = document.querySelector(".rv-nav-ink");
@@ -36,6 +38,7 @@ function moveInk(tab) {
 }
 
 function openPage(page) {
+    if (ink && !tabs.some((tab) => tab.dataset.page === String(page))) ink.style.width = "0px"; //pages without a tab (Support)
     for (const tab of tabs) {
         const active = tab.dataset.page === String(page);
         tab.classList.toggle("rv-active", active);
@@ -55,6 +58,7 @@ function openPage(page) {
 tabs.forEach((tab) => tab.addEventListener("click", () => openPage(tab.dataset.page)));
 window.addEventListener("resize", () => moveInk(document.querySelector(".rv-tab.rv-active")));
 document.getElementById("rvHeaderAdsButton").addEventListener("click", () => openPage(5));
+document.getElementById("rvHeaderSupportButton").addEventListener("click", () => openPage(7));
 
 //green dot on the Trade Ads tab and header button while auto-post is on
 function showAdState() {
@@ -471,8 +475,7 @@ async function toggleThemeEditor(themeId) {
         box.append(title, hint, fxBox);
         return;
     }
-    fxBox.append(fxTitle, fxHint, toggleRow, strengthRow, speedRow);
-    box.append(title, hint, grid, buttons, fxBox);
+    box.append(title, hint, grid, buttons); //RGB glow removed in 1.0.3
 }
 
 async function buildThemePicker() {
@@ -546,7 +549,7 @@ async function buildThemePicker() {
             chrome.storage.onChanged.addListener((changes, area) => {
                 if (area === "local" && EFFECTS_STORAGE_KEY in changes) rgb.setAttribute("aria-pressed", String(!!changes[EFFECTS_STORAGE_KEY].newValue?.rgb));
             });
-            if (!theme.rgbFlow) card.appendChild(rgb);
+            //RGB glow switch removed in 1.0.3
             gear.addEventListener("click", openEditor);
             gear.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") openEditor(event); });
             card.appendChild(gear);

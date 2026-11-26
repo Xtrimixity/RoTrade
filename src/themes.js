@@ -15,7 +15,7 @@ export const COLOR_FIELDS = [
     ["accent", "Accent (buttons, highlights)"], ["accent2", "Accent 2 (petals, links)"], ["bg", "Background"], ["text", "Text"],
     ["surface", "Panels and cards"], ["border", "Borders"], ["value", "Value numbers"], ["good", "Win / good"], ["bad", "Loss / bad"]
 ];
-export const DEFAULT_THEME_ID = "rovalk";
+export const DEFAULT_THEME_ID = "roblox"; //Roblox Default: looks like Roblox itself until the user picks something else
 const STYLE_ELEMENT_ID = "rovalk-theme-style";
 
 /*
@@ -30,30 +30,25 @@ Fields:
 */
 export const THEMES = [
     {
+        id: "roblox", name: "Roblox Default", tagline: "Roblox's own look, dark or light like your Roblox setting",
+        accent: "#335FFF", accent2: "#6E8BFF", bg: "#F2F4F5", text: "#393B3D",
+        surface: "#FFFFFF", border: "#D0D3D6", value: null, good: "#02B757", bad: "#E0313D", override: true, robloxDefault: true
+    },
+    {
         id: "rovalk", name: "RoTrade Orange", tagline: "Warm orange, the RoTrade look",
         accent: "#EA580C", accent2: "#FB923C", bg: "#FFFFFF", text: "#333333",
         surface: "rgba(127,127,127,0.18)", border: "rgba(127,127,127,0.35)",
         value: null, good: "#16A34A", bad: "#DC2626", override: false
     },
     {
-        id: "roblox", name: "Roblox Default", tagline: "Roblox's own look, dark or light like your Roblox setting",
-        accent: "#335FFF", accent2: "#6E8BFF", bg: "#F2F4F5", text: "#393B3D",
-        surface: "#FFFFFF", border: "#D0D3D6", value: null, good: "#02B757", bad: "#E0313D", override: true, robloxDefault: true
-    },
-    {
         id: "cherry-blossom", name: "Cherry Blossom", tagline: "Pink petals drifting on a dusk breeze",
         accent: "#FF8FB1", accent2: "#FFD1DC", bg: "#1B1020", text: "#FFE9F0",
         surface: "#27162E", border: "#5E2E57", value: "#FFB3C9", good: "#9BE8B5", bad: "#FF7A8A", override: true, ambient: "petals", siteWide: true, configurable: true
-    },
-    {
-        id: "rgb-flow", name: "RGB Flow", tagline: "Slow rainbow light flowing through everything",
-        accent: "#FF5E8A", accent2: "#5EC8FF", bg: "#0B0B10", text: "#F2F2FA",
-        surface: "#14141C", border: "#34344A", value: "#EDEBFF", good: "#6EF2A8", bad: "#FF6E8A", override: true, siteWide: true, rgbFlow: true
     }
 ];
 
 export function getTheme(id) {
-    return THEMES.find((theme) => theme.id === id) ?? THEMES[0];
+    return THEMES.find((theme) => theme.id === id) ?? THEMES.find((theme) => theme.id === DEFAULT_THEME_ID);
 }
 
 //The theme with any colors the user edited for it laid over the top.
@@ -262,70 +257,11 @@ html .trade-offer-divider.rv-orb-host[class]{border:0 !important;background:tran
 `;
     }
 
-    // RGB light: one slowly turning hue (--rv-hue) and angle (--rv-angle) drive rainbow borders that rotate around every panel,
-    // a flowing rainbow strip along the top, gradient headings and buttons, a color wash over the page and (for RGB Flow) the accent colors themselves.
-    // The hue moves in small steps (about two a second) instead of every frame, so the browser restyles the page only a couple of times a second.
-    if (theme.configurable || theme.rgbFlow) {
-        const R = 'html[data-rv-rgb="on"][data-rv-theme]'; //the extra attribute makes these win over the theme's own box rules
-        const PANELS = '.section-content,.card,.rbx-game-server-item,.rbx-public-game-server-item,.rbx-friends-game-server-item,.rbx-private-game-server-item,.trades-container,.dropdown-menu,.modal-content,.menu-vertical,.trade-list-detail-offer,.trade-request-window-offer,.theme-card,.rv-chart-box,.theme-editor,.rv-trade,.rv-stat';
-        css += `
-@property --rv-hue{syntax:"<number>";inherits:true;initial-value:0;}
-@property --rv-angle{syntax:"<angle>";inherits:true;initial-value:0deg;}
-@keyframes rv-hue-cycle{to{--rv-hue:360;--rv-angle:360deg;}}
-html[data-rv-rgb="on"]{
-  animation:rv-hue-cycle var(--rv-rgb-period,90s) steps(var(--rv-rgb-steps,180),end) infinite;
-  --rv-glow:hsl(var(--rv-hue) 90% 64% / var(--rv-rgb-alpha,.5));
-  --rv-glow-soft:hsl(var(--rv-hue) 90% 64% / calc(var(--rv-rgb-alpha,.5) * .55));
-  --rv-rainbow:conic-gradient(from var(--rv-angle),hsl(var(--rv-hue) 92% 62%),hsl(calc(var(--rv-hue) + 60) 92% 62%),hsl(calc(var(--rv-hue) + 120) 92% 62%),hsl(calc(var(--rv-hue) + 180) 92% 62%),hsl(calc(var(--rv-hue) + 240) 92% 62%),hsl(calc(var(--rv-hue) + 300) 92% 62%),hsl(var(--rv-hue) 92% 62%));
-  --rv-flow:linear-gradient(90deg,hsl(var(--rv-hue) 92% 64%),hsl(calc(var(--rv-hue) + 70) 92% 64%),hsl(calc(var(--rv-hue) + 140) 92% 64%),hsl(calc(var(--rv-hue) + 210) 92% 64%),hsl(calc(var(--rv-hue) + 280) 92% 64%),hsl(var(--rv-hue) 92% 64%));
-}
-/* color wash over the page plus a rainbow strip along the very top */
-html[data-rv-rgb="on"]::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;transform:translateZ(0);background:radial-gradient(1100px 650px at 6% -10%,hsl(var(--rv-hue) 90% 62% / calc(var(--rv-rgb-alpha,.5) * .5)),transparent 68%),radial-gradient(1100px 650px at 104% 110%,hsl(calc(var(--rv-hue) + 140) 90% 62% / calc(var(--rv-rgb-alpha,.5) * .45)),transparent 68%),radial-gradient(800px 500px at 50% 120%,hsl(calc(var(--rv-hue) + 250) 90% 62% / calc(var(--rv-rgb-alpha,.5) * .25)),transparent 70%);}
-html[data-rv-rgb="on"]::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;pointer-events:none;z-index:2147483000;background:var(--rv-flow);box-shadow:0 0 14px var(--rv-glow);}
-/* panels: a rainbow border that turns slowly around the edge, with a soft glow outside */
-${R} :is(${PANELS}){border:2px solid transparent !important;background:linear-gradient(var(--rv-card,#14141c),var(--rv-card,#14141c)) padding-box,var(--rv-rainbow) border-box !important;box-shadow:0 0 18px var(--rv-glow-soft) !important;}
-${R} #rovalkTradeTools,${R} #rovalkOrb .rv-orb-capsule,${R} #rovalkProfileBanner,${R} #rovalkInventorySummary{border:2px solid transparent !important;background:linear-gradient(var(--rv-card,#14141c),var(--rv-card,#14141c)) padding-box,var(--rv-rainbow) border-box !important;box-shadow:0 0 18px var(--rv-glow-soft) !important;}
-/* game tiles: one clean, thick ring that looks the same hovered or not. It is drawn on its own layer with a gradient
-   that only shifts color (no rotating), so Roblox redrawing the tile on hover can no longer make it flicker. */
-${R} :is(.game-card-container,.game-tile):not(:has(.game-card-container,.game-tile)){position:relative !important;padding:4px 4px 7px !important;overflow:hidden !important;border:0 !important;border-radius:12px !important;background:var(--rv-card,#14141c) !important;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 0 18px var(--rv-glow-soft) !important;transition:transform .15s ease,box-shadow .15s ease !important;}
-${R} :is(.game-card-container,.game-tile):not(:has(.game-card-container,.game-tile))::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:3px;pointer-events:none;z-index:6;
-  background:linear-gradient(135deg,hsl(var(--rv-hue) 92% 64%),hsl(calc(var(--rv-hue) + 50) 92% 64%),hsl(calc(var(--rv-hue) + 110) 92% 62%),hsl(calc(var(--rv-hue) + 180) 92% 64%));
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);}
-${R} :is(.game-card-container,.game-tile):not(:has(.game-card-container,.game-tile)):hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(0,0,0,.25),0 8px 26px var(--rv-glow) !important;}
-/* a tile element wrapped around another one (Roblox's Continue row does this) or any single-tile wrapper found by
-   siteTheme.js stays completely invisible, so each game shows exactly one ring */
-${R} :is(.game-card-container,.game-tile):has(.game-card-container,.game-tile),${R} [data-rv-tile-wrap][data-rv-tile-wrap]{background:transparent !important;border:0 !important;box-shadow:none !important;outline:0 !important;transform:none !important;border-image:none !important;}
-${R} :is(.game-card-container,.game-tile):has(.game-card-container,.game-tile)::after,${R} :is(.game-card-container,.game-tile):has(.game-card-container,.game-tile)::before,${R} [data-rv-tile-wrap]::after,${R} [data-rv-tile-wrap]::before{content:none !important;}
-${R} :is(.item-card-container){border:2px solid transparent !important;background:linear-gradient(var(--rv-card,#14141c),var(--rv-card,#14141c)) padding-box,var(--rv-rainbow) border-box !important;}
-${R} :is(#header,.rbx-header,.navbar-fixed-top){border-bottom:3px solid transparent !important;border-image:var(--rv-flow) 1 !important;box-shadow:0 6px 22px var(--rv-glow-soft) !important;}
-${R} :is(.rbx-left-col,#left-navigation-container){box-shadow:0 0 22px var(--rv-glow-soft),inset -2px 0 0 var(--rv-glow) !important;}
-/* anything the repaint pass found that is not a named panel */
-${R} [data-rv-gray="surface"]{box-shadow:0 0 0 1px var(--rv-glow),0 0 14px var(--rv-glow-soft) !important;}
-${R} :is(.game-card,.list-item:has(.game-card-container),.game-card-link,.game-card-info),${R} :is(.rbx-game-server-item,.rbx-public-game-server-item,.rbx-friends-game-server-item,.rbx-private-game-server-item) *{box-shadow:none !important;border-image:none !important;}
-${R} :is(.rbx-game-server-item,.rbx-public-game-server-item,.rbx-friends-game-server-item,.rbx-private-game-server-item) :is(.card-item,.section-content){border-color:transparent !important;background:transparent !important;}
-${R} [data-rv-gray="thin"]{background:var(--rv-flow) !important;}
-${R} [data-rv-gborder]{border-color:var(--rv-glow) !important;}
-${R} [data-rv-gul]{border-bottom-color:transparent !important;border-image:var(--rv-flow) 1 !important;}
-/* buttons and bars become gradients. Text stays its normal theme color everywhere: rainbow text was applied by class
-   name, so some titles turned rainbow and others right next to them didn't. */
-${R} :is(.btn-primary-md,.btn-primary-lg,.btn-primary-sm,.btn-growth-md,.btn-growth-lg,.btn-cta-md,.btn-cta-lg,.btn-common-play-game-lg,.rv-btn,#rovalkFairness .rv-fill){background:var(--rv-flow) !important;background-size:200% 100%;border-color:transparent !important;color:#0B0B10 !important;box-shadow:0 0 14px var(--rv-glow-soft);}
-${R} :is(.progress-bar .bar,.progress-bar > div,[role="progressbar"] > div){background:var(--rv-flow) !important;}
-${R} ::-webkit-scrollbar-thumb{background:linear-gradient(hsl(var(--rv-hue) 90% 62%),hsl(calc(var(--rv-hue) + 120) 90% 62%)) !important;}
-${R} ::selection{background:hsl(var(--rv-hue) 90% 62%);color:#0B0B10;}
-${R} :focus-visible{outline:2px solid hsl(var(--rv-hue) 90% 66%) !important;outline-offset:2px;}
-@media (prefers-reduced-motion:reduce){html[data-rv-rgb="on"]{animation:none;--rv-hue:290;--rv-angle:0deg;}}
-`;
-    }
     if (theme.robloxDefault) {
         //Roblox's own palette in both modes; html[data-rv-roblox-mode] is set from Roblox's page (see trackRobloxMode)
         css += `
 html[data-rv-roblox-mode="dark"]{--rv-page-bg:#191B1D;--rv-page-text:#F7F7F8;--rv-card:#232527;--rv-card-border:#393B3D;--rv-bg:#191B1D;--rv-text:#F7F7F8;--rv-w-text:#F7F7F8;--rv-surface:#232527;--rv-border:#393B3D;}
 html[data-rv-roblox-mode="light"]{--rv-page-bg:#F2F4F5;--rv-page-text:#393B3D;--rv-card:#FFFFFF;--rv-card-border:#D0D3D6;--rv-bg:#F2F4F5;--rv-text:#393B3D;--rv-w-text:#393B3D;--rv-surface:#FFFFFF;--rv-border:#D0D3D6;}
-`;
-    }
-    if (theme.rgbFlow) {
-        css += `
-html[data-rv-theme="rgb-flow"]{--rv-accent:hsl(var(--rv-hue) 88% 64%);--rv-accent-2:hsl(calc(var(--rv-hue) + 50) 90% 76%);--rv-border:hsl(var(--rv-hue) 45% 28%);--rv-card-border:hsl(var(--rv-hue) 45% 30%);--rv-on-accent:#0B0B10;}
 `;
     }
     return css;
@@ -345,21 +281,9 @@ export function applyTheme(themeId, customAccent, colors, effects) {
     //the animated layer watches this to restart when colors are edited
     document.documentElement.setAttribute("data-rv-colors", `${customAccent && isValidHex(customAccent) ? customAccent : theme.accent}|${theme.accent2}`);
     const root = document.documentElement;
-    const fx = { ...DEFAULT_EFFECTS, ...(effects ?? {}) };
-    if (theme.rgbFlow || (theme.configurable && fx.rgb)) {
-        const flow = !!theme.rgbFlow; //the RGB Flow theme is always on and has its own strength and speed
-        const strength = Math.max(1, Math.min(10, Number(flow ? fx.flowStrength : fx.strength) || (flow ? DEFAULT_EFFECTS.flowStrength : DEFAULT_EFFECTS.strength)));
-        const period = Math.max(10, Math.min(600, Number(flow ? fx.flowPeriod : fx.period) || (flow ? DEFAULT_EFFECTS.flowPeriod : DEFAULT_EFFECTS.period)));
-        root.style.setProperty("--rv-rgb-alpha", (0.15 + strength * 0.07).toFixed(2));
-        root.style.setProperty("--rv-rgb-period", period + "s");
-        root.style.setProperty("--rv-rgb-steps", String(Math.max(60, Math.min(600, Math.round(period * 2))))); //about two color updates a second
-        root.setAttribute("data-rv-rgb", "on");
-    } else {
-        root.removeAttribute("data-rv-rgb");
-        root.style.removeProperty("--rv-rgb-alpha");
-        root.style.removeProperty("--rv-rgb-period");
-        root.style.removeProperty("--rv-rgb-steps");
-    }
+    //RGB effects were removed in 1.0.3: clear anything an older version left on the page
+    root.removeAttribute("data-rv-rgb");
+    for (const name of ["--rv-rgb-alpha", "--rv-rgb-period", "--rv-rgb-steps"]) root.style.removeProperty(name);
     root.setAttribute("data-rv-theme", theme.id);
     return theme;
 }

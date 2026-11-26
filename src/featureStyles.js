@@ -41,6 +41,15 @@ const css = `
 /* ---------- market table ---------- */
 #rovalkTradeTools .rv-market{container-type:inline-size;}
 .rv-card-rap{font-size:12px;line-height:16px;opacity:.7;font-weight:500;padding-left:25px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#rotradeQueueBar{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:2147483000;display:flex;align-items:center;gap:14px;max-width:min(860px,calc(100vw - 24px));padding:10px 14px;border-radius:14px;background:#17120E;color:#F5F1EC;border:1px solid #EA580C;box-shadow:0 12px 34px rgba(0,0,0,.45);font:500 13px/1.4 "Builder Sans",Arial,sans-serif;}
+#rotradeQueueBar[data-tone="ready"]{border-color:#22C55E;}
+#rotradeQueueBar[data-tone="warn"]{border-color:#F59E0B;}
+#rotradeQueueBar .rv-qbar-main{display:flex;flex-direction:column;gap:2px;min-width:0;}
+#rotradeQueueBar .rv-qbar-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#FB923C;}
+#rotradeQueueBar .rv-qbar-buttons{display:flex;gap:6px;flex:none;}
+#rotradeQueueBar .rv-qbar-btn{padding:6px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.25);background:transparent;color:inherit;font:700 12px Arial,sans-serif;cursor:pointer;}
+#rotradeQueueBar .rv-qbar-btn:hover{border-color:#FB923C;}
+#rotradeQueueBar .rv-qbar-primary{background:#EA580C;border-color:#EA580C;color:#fff;}
 #rovalkTradeTools.rv-wide{margin:16px 0 0 !important;width:100% !important;max-width:none !important;flex:0 0 100% !important;grid-column:1 / -1 !important;clear:both;float:none !important;box-sizing:border-box;order:9999;}
 #rovalkTradeTools .rv-even-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 16px;}
 #rovalkTradeTools .rv-even-sub{font-size:12px;font-weight:700;opacity:.8;margin:2px 0 6px;}

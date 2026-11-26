@@ -17,6 +17,7 @@ import { updateMarketBadges } from "./features/marketPulse";
 import updatePartnerCard from "./features/partnerCard";
 import updateSerials from "./features/serials";
 import updateGoodDeals from "./features/goodDeals";
+import updateQueueFill from "./features/queueFill";
 import { initTheme } from "./themes";
 import { initPageEffects } from "./pageEffects";
 import { initTradeRedesign } from "./tradeRedesign";
@@ -48,6 +49,7 @@ function update() {
     updateFlags();
     updateTradeListValues();
     updateSerials();
+    updateQueueFill(); //trade queue: fill in the trade (you press Make Offer)
 
     tryAddingRobuxHandler();
 }

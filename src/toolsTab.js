@@ -1,5 +1,6 @@
 /*
 Popup "Tools" tab. A row of chips switches between:
+  Trade queue     set up one trade and RoTrade fills it in for each person; you press Make Offer (queueView.js)
   Wishlist        items you starred (also from the hover card); highlighted in trades and inventories
   Value changes   every Rolimons value change RoValk has seen, yours first
   Goal planner    pick an item you want and see which of your items add up to it
@@ -10,10 +11,11 @@ Popup "Tools" tab. A row of chips switches between:
 import * as utilities from "./utilities";
 import { KEYS, get, onChange, toggleWish } from "./store";
 import { percentDiff, verdictKey, VERDICT_TEXT, formatPercent } from "./tradeMath";
+import { queueView } from "./queueView";
 import { el, button, send, rolimonsData, myInventory, itemSearch, info, relative, section, thumbnails, thumb } from "./popupKit";
 
 const VIEWS = [
-    ["wishlist", "Wishlist"], ["changes", "Value changes"], ["goal", "Goal planner"],
+    ["queue", "Trade queue"], ["wishlist", "Wishlist"], ["changes", "Value changes"], ["goal", "Goal planner"],
     ["compare", "Compare offers"], ["portfolio", "Portfolio"], ["expiring", "Expiring"]
 ];
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -38,7 +40,7 @@ function itemRow(name, valueText, extra, id) {
 }
 
 export async function mountTools(container) {
-    let view = "wishlist";
+    let view = "queue";
     container.replaceChildren(el("p", "rv-calc-hint", "Loading..."));
     const data = await rolimonsData();
     const nav = el("div", "rv-tool-nav");
@@ -56,7 +58,7 @@ export async function mountTools(container) {
 
     async function render() {
         body.replaceChildren(el("p", "rv-calc-hint", "Loading..."));
-        const views = { wishlist, changes, goal, compare, portfolio, expiring };
+        const views = { queue: () => queueView(data, render), wishlist, changes, goal, compare, portfolio, expiring };
         const content = await views[view]();
         body.replaceChildren(...[].concat(content));
     }
